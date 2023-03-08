@@ -1,17 +1,11 @@
 import level1
 import sim_utils
 import jax.numpy as np
-import jax.random as jrand
-import scipy.linalg as splinalg
 
 
-prng = jrand.PRNGKey(1)
-
-
-def random_matrix(probabilities):
+def sigmoid_matrix(probabilities, rand_mat):
     # Produce continuous Bernoulli substitute
-    rmat = jrand.uniform(prng, probabilities.shape)
-    return 1 / (1 + np.exp(32 * (rmat - probabilities)))  # Factor 32 can change
+    return 1 / (1 + np.exp(32 * (rand_mat - probabilities)))  # Factor 32 can change
 
 
 def pref_diff(pref_a, pref_b):
@@ -28,8 +22,8 @@ def generate_prob_matrix(pref_E, pref_I, P, w):
     return np.block([[prob_EE, prob_EI], [prob_IE, prob_II]])
 
 
-def generate_C_matrix(prob):
-    C = random_matrix(prob) * (1-np.eye(prob.shape[0]))
+def generate_C_matrix(prob, rand_mat):
+    C = sigmoid_matrix(prob, rand_mat) * (1-np.eye(prob.shape[0]))
     return C
 
 

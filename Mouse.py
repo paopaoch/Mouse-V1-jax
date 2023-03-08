@@ -1,15 +1,20 @@
-import level3
+import level4, level3, level2, level1
 import jax.numpy as np
 import os
 import pickle
+import matplotlib.pyplot as plt
+import time
 
 # Reference data
 with open(os.path.join('Data', 'data_save.pkl'), 'rb') as f:
     data = pickle.load(f)
 
 # Network size
-N_E = 80
-N_I = 20
+N = 1000
+
+N_E = int(.8 * N)
+N_I = N - N_E
+print(N_E, N_I)
 N = N_E + N_I
 
 pref_E = np.linspace(0, 180, N_E, False)
@@ -19,6 +24,10 @@ pref = np.concatenate([pref_E, pref_I])
 # Contrast and orientation ranges
 orientations = np.array([0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165])
 contrasts = np.array([0., 0.0432773, 0.103411, 0.186966, 0.303066, 0.464386, 0.68854, 1.])
+
+
+step_size_effect = 1
+n_subsamples = 100
 
 # Parameters for input stage
 g_E = 1
@@ -58,17 +67,42 @@ tau_ref = np.concatenate([
 
 
 # First layer
-J = np.log(np.array([[0.63, 0.6],
-                    [0.32, 0.25]]))
+J = np.array([[0.63, 0.6], [0.32, 0.25]])
 
-P = np.log(np.array([[0.11, 0.11], 
-                    [0.45, 0.45]]))
+P = np.array([[0.11, 0.11], [0.45, 0.45]])
 
-w = np.log(32) * np.ones([2,2])
+w = 32 * np.ones([2,2])
 
 
-if __name__ == "__main__":
-    L = level3.loss_from_parameters(data, 1, 40, N_E, N_I, contrasts, orientations, J*10, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+def test1():
+    
+    pref = np.concatenate([pref_E, pref_I])
+    prob = level2.generate_prob_matrix(pref_E, pref_I, P, w)
+    
+    c = contrasts[0]
+    theta = orientations[0]
 
+    C = level2.generate_C_matrix(prob)
+    W, W2 = level2.generate_network(C, J, N_E, N_I)
+
+    level1.network_to_state(N, W, W2, c, theta, T_inv, tau, tau_ref, pref, g, w_ff, sig_ext)
+
+
+def test2():
+    t0 = time.process_time()
+    TC, avg_step = level3.generate_tuning_curves(N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    print(time.process_time() - t0)
+
+    for i, tc in enumerate(TC):
+        plt.imshow(tc)
+        plt.savefig(os.path.join("plots", "p"+str(i)+".png"))
+
+
+def test3():
+    t0 = time.process_time()
+    L = level3.loss_from_parameters(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    print(time.process_time() - t0)
     print(L)
 
+if __name__ == "__main__":
+    level4.optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
