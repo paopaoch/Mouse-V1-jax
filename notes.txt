@@ -1,0 +1,12 @@
+Network size up to ~3000 run generate_tuning_curves in very similar times, about 42 seconds with 100 iterations of Euler2fixedpt.
+
+Iterations of Euler2fixedpt have strong impact on efficiency (seems linear as expected) so has been reduced from 500 to 100 for testing.
+500 iterations takes around 4 seconds on N=1000 matrix. 22 seconds on N=10000.
+100 iterations takes around 1.3 seconds on N=1000.
+
+Issue computing grad, crashes every time, even for small networks.
+
+Only 10% processor is used and no GPU
+
+N=1000: 41 seconds, loss=31.0
+N=10000: 380 seconds, loss=6.90

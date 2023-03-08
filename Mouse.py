@@ -1,5 +1,6 @@
 import level4, level3, level2, level1
 import jax.numpy as np
+from jax import grad
 import os
 import pickle
 import matplotlib.pyplot as plt
@@ -67,11 +68,13 @@ tau_ref = np.concatenate([
 
 
 # First layer
-J = np.array([[0.63, 0.6], [0.32, 0.25]])
+J = np.array([[0.63, 0.6], [0.32, 0.25]]) * np.sqrt(10)
 
 P = np.array([[0.11, 0.11], [0.45, 0.45]])
 
 w = 32 * np.ones([2,2])
+
+example_random = level3.random_matrix(N)
 
 
 def test1():
@@ -82,15 +85,16 @@ def test1():
     c = contrasts[0]
     theta = orientations[0]
 
-    C = level2.generate_C_matrix(prob)
+    C = level2.generate_C_matrix(prob, example_random)
     W, W2 = level2.generate_network(C, J, N_E, N_I)
 
+    t0 = time.process_time()
     level1.network_to_state(N, W, W2, c, theta, T_inv, tau, tau_ref, pref, g, w_ff, sig_ext)
-
+    print(time.process_time() - t0)
 
 def test2():
     t0 = time.process_time()
-    TC, avg_step = level3.generate_tuning_curves(N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    TC, avg_step = level3.generate_tuning_curves(example_random, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
     print(time.process_time() - t0)
 
     for i, tc in enumerate(TC):
@@ -100,9 +104,11 @@ def test2():
 
 def test3():
     t0 = time.process_time()
-    L = level3.loss_from_parameters(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    L = level3.loss_from_parameters(data, step_size_effect, n_subsamples, example_random, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
     print(time.process_time() - t0)
-    print(L)
+    print("Loss: "+str(L))
 
 if __name__ == "__main__":
-    level4.optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    test3()
+
+    #level4.optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
