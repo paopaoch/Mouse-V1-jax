@@ -27,7 +27,7 @@ orientations = np.array([0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165])
 contrasts = np.array([0., 0.0432773, 0.103411, 0.186966, 0.303066, 0.464386, 0.68854, 1.])
 
 
-step_size_effect = 1
+step_size_effect = 0.01
 n_subsamples = 100
 
 # Parameters for input stage
@@ -92,6 +92,7 @@ def test1():
     level1.network_to_state(N, W, W2, c, theta, T_inv, tau, tau_ref, pref, g, w_ff, sig_ext)
     print(time.process_time() - t0)
 
+
 def test2():
     t0 = time.process_time()
     TC, avg_step = level3.generate_tuning_curves(example_random, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
@@ -108,7 +109,10 @@ def test3():
     print(time.process_time() - t0)
     print("Loss: "+str(L))
 
-if __name__ == "__main__":
-    test3()
 
-    #level4.optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+def test4():
+    level4.optimise_JPw_2(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+
+
+if __name__ == "__main__":
+    test4()
