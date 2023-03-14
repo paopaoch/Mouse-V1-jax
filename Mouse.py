@@ -111,8 +111,18 @@ def test3():
 
 
 def test4():
-    level4.optimise_JPw_2(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    level4.optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
 
 
 if __name__ == "__main__":
+    def f(x):
+        return np.exp(x)
+    gf = grad(f)
+
+    x = 2.0
+
+    print(f(x))
+    print(gf(x))
+    print()
+
     test4()
