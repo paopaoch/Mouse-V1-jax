@@ -1,6 +1,12 @@
 import jax.numpy as np
 
 
+sigmoid = lambda x: 1 / (1 + np.exp(-x))
+hardness = 5
+
+softplus = lambda x, b: np.log(1 + np.exp(b * x)) / b
+
+
 def circ_gauss(x, w):
     # Circular Gaussian from 0 to 180 deg
     return np.exp((np.cos(x * np.pi/90) - 1) / np.square(np.pi/90 * w))
@@ -12,7 +18,7 @@ def block_matrix(V, d):
                      [V[1,0]*np.ones((d[1], d[0])), V[1,1]*np.ones((d[1], d[1]))]])
 
 
-def Euler2fixedpt(dxdt, x_initial, Nmax=4, Navg=4, dt=0.001, xtol=1e-5, xmin=1e-0):
+def Euler2fixedpt(dxdt, x_initial, Nmax=10, Navg=5, dt=0.001, xtol=1e-5, xmin=1e-0):
     """
     Finds the fixed point of the D-dim ODE set dx/dt = v(x) (where the function v(.) is called dxdt(.) in this code) 
     using the Euler update with sufficiently large dt (to gain in computational time).
@@ -82,16 +88,22 @@ def Phi(mu, sigma, tau=0.01, Vt=20, Vr=0, tau_ref=0):
 
     rate = np.zeros_like(xm)
     
-    xm_pos = xm > 0
-    rate = (rate * (1 - xm_pos)) + np.nan_to_num(xm_pos / (f_ricci(xp) - f_ricci(xm)))
+    xm_pos = sigmoid(xm * hardness)
+    #xm_pos = xm > 0
+    rate = (rate * (1 - xm_pos)) + (xm_pos / softplus(f_ricci(xp) - f_ricci(xm), hardness))
     
-    inds = (xp > 0) & (xm <= 0)
-    rate = (rate * (1 - inds)) + np.nan_to_num(inds / ( f_ricci(xp) + np.exp(xm**2) * g_ricci(-xm)))
+
+    inds = sigmoid(-xm * hardness) * sigmoid(xp * hardness)
+    #inds = (xp > 0) & (xm <= 0)
+    rate = (rate * (1 - inds)) + (inds / (f_ricci(xp) + np.exp(xm**2) * g_ricci(-xm)))
     
     
-    xp_neg = xp <= 0
-    rate = (rate * (1 - xp_neg)) + np.nan_to_num(xp_neg * ( np.exp(-xm**2 - np.log(g_ricci(-xm) 
-                         - np.exp(xp**2 - xm**2) * g_ricci(-xp)))))
+    # The following is commented out because Vr is always zero, so xp is always positive
+
+    # xp_neg = sigmoid(-xp * hardness)
+    # xp_neg = xp <= 0
+    # rate = (rate * (1 - xp_neg)) + (xp_neg * ( np.exp(-xm**2 - np.log(g_ricci(-xm) 
+    #                      - np.exp(xp**2 - xm**2) * g_ricci(-xp)))))
     
     rate = 1 / (tau_ref + 1 / rate)
     
@@ -105,20 +117,23 @@ def lif_regular(mu, tau, Vt, Vr):
     return rate / tau
 
 def f_ricci(x):
-    z = x / (1 + x)
+    x_plus = softplus(x, hardness)
+
+    z = x_plus / (1 + x_plus)
     a = np.array([0.0, 
                   .22757881388024176, .77373949685442023, .32056016125642045, 
                   .32171431660633076, .62718906618071668, .93524391761244940, 
                   1.0616084849547165, .64290613877355551, .14805913578876898])
 
 #    return np.log(2*x + 1) + a @ (-z)**np.arange(10)
-    return np.log(2*x + 1) + (  a[1] *(-z)**1 + a[2] *(-z)**2 + a[3] *(-z)**3
-                              + a[4] *(-z)**4 + a[5] *(-z)**5 + a[6] *(-z)**6
-                              + a[7] *(-z)**7 + a[8] *(-z)**8 + a[9] *(-z)**9 )
+    return np.log(2*x_plus + 1) + (a[1] *(-z)**1 + a[2] *(-z)**2 + a[3] *(-z)**3
+                                + a[4] *(-z)**4 + a[5] *(-z)**5 + a[6] *(-z)**6
+                                + a[7] *(-z)**7 + a[8] *(-z)**8 + a[9] *(-z)**9 )
 
 def g_ricci(x):
+    x_plus = softplus(x, hardness)
 
-    z = x / (2 + x)
+    z = x_plus / (2 + x_plus)
     enum = (  3.5441754117462949 * z    - 7.0529131065835378 * z**2 
             - 56.532378057580381 * z**3 + 279.56761105465944 * z**4 
             - 520.37554849441472 * z**5 + 456.58245777026514 * z**6  

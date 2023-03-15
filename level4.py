@@ -44,7 +44,7 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
 
     gradient_func = grad(optimising_func)
 
-    for i in range(3):
+    for i in range(5):
         print("params: " + str(params))
         t0 = time.process_time()
 
@@ -58,5 +58,8 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
         t2 = time.process_time()
         print("gradient: " + str(gradient))
         print("cpu time: " + str(t2 - t1))
+        print()
+
+        params = params - 0.03 * gradient
 
     print(loss)

@@ -1,5 +1,6 @@
 import sim_utils
 import jax.numpy as np
+from jax import jit
 
 
 
@@ -29,7 +30,7 @@ def solve_fixed_point(N, W, W2, h, xi, T_inv, tau, tau_ref):
         return T_inv * (sim_utils.Phi(*get_mu_sigma(W, W2, r, h, xi, tau), tau, tau_ref=tau_ref) - r)
         
     # Solve using Euler
-    r_fp, avg_step = sim_utils.Euler2fixedpt(drdt_func, r_init)
+    r_fp, avg_step = sim_utils.Euler2fixedpt(jit(drdt_func), r_init)
     return r_fp, avg_step
 
 

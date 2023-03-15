@@ -5,7 +5,7 @@ import jax.numpy as np
 
 def sigmoid_matrix(probabilities, rand_mat):
     # Produce continuous Bernoulli substitute
-    return 1 / (1 + np.exp(32 * (rand_mat - probabilities)))  # Factor 32 can change
+    return sim_utils.sigmoid(32 * (probabilities - rand_mat))  # Factor 32 can change
 
 
 def pref_diff(pref_a, pref_b):

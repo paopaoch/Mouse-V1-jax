@@ -1,4 +1,4 @@
-import level4, level3, level2, level1
+import level4, level3, level2, level1, sim_utils
 import jax.numpy as np
 from jax import grad
 import os
@@ -115,8 +115,12 @@ def test4():
 
 
 if __name__ == "__main__":
+    x = np.linspace(-10, 10, 101)
+
+    plt.plot(x, sim_utils.f_ricci(x))
+    plt.savefig(os.path.join("plots", "plot.png"))
     def f(x):
-        return np.exp(x)
+        return np.maximum(np.exp(x), 0)
     gf = grad(f)
 
     x = 2.0
