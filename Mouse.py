@@ -7,6 +7,9 @@ import pickle
 import matplotlib.pyplot as plt
 import time
 
+#print("jax backend {}".format(xla_bridge.get_backend().platform))
+print(jax.devices())
+
 # Reference data
 with open(os.path.join('Data', 'data_save.pkl'), 'rb') as f:
     data = pickle.load(f)
@@ -116,7 +119,6 @@ def test4():
 
 
 if __name__ == "__main__":
-    print(jax.devices())
 
     x = np.linspace(-10, 10, 101)
 

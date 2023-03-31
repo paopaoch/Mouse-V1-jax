@@ -67,7 +67,8 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
 
         log_params = log_params - 0.03 * gradient
 
-        tracker = tracker.at[:, :, i].set(np.exp(log_params))
+        tracker = tracker.at[:, :2, i].set(np.exp(log_params[:, 0, :]))
+        tracker = tracker.at[:, 2:, i].set(np.exp(log_params[:, 1, :]))
         loss_track = loss_track.at[i].set(loss)
 
     print(loss)
