@@ -11,7 +11,7 @@ with open(os.path.join('Data', 'data_save.pkl'), 'rb') as f:
     data = pickle.load(f)
 
 # Network size
-N = 1000
+N = 100
 
 N_E = int(.8 * N)
 N_I = N - N_E
@@ -119,14 +119,7 @@ if __name__ == "__main__":
 
     plt.plot(x, sim_utils.f_ricci(x))
     plt.savefig(os.path.join("plots", "plot.png"))
-    def f(x):
-        return np.maximum(np.exp(x), 0)
-    gf = grad(f)
-
-    x = 2.0
-
-    print(f(x))
-    print(gf(x))
-    print()
+    
+    
 
     test4()
