@@ -1,6 +1,7 @@
 import level4, level3, level2, level1, sim_utils
 import jax.numpy as np
 from jax import grad
+import jax
 import os
 import pickle
 import matplotlib.pyplot as plt
@@ -11,7 +12,7 @@ with open(os.path.join('Data', 'data_save.pkl'), 'rb') as f:
     data = pickle.load(f)
 
 # Network size
-N = 100
+N = 1000
 
 N_E = int(.8 * N)
 N_I = N - N_E
@@ -115,6 +116,8 @@ def test4():
 
 
 if __name__ == "__main__":
+    print(jax.devices())
+
     x = np.linspace(-10, 10, 101)
 
     plt.plot(x, sim_utils.f_ricci(x))

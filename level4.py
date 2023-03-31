@@ -47,6 +47,7 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
     gradient_func = grad(optimising_func)
 
     tracker = np.zeros((3, 4, 5))
+    loss_track = np.zeros((5,1))
 
     for i in range(5):
         print("params: " + str(np.exp(log_params)))
@@ -66,11 +67,16 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
 
         log_params = log_params - 0.03 * gradient
 
-        tracker = tracker.at[:, :, i].set(loss)
+        tracker = tracker.at[:, :, i].set(np.exp(log_params))
+        loss_track = loss_track.at[i].set(loss)
 
     print(loss)
     
     for i in range(3):
-        plt.plot(range(5), tracker[i])
+        plt.plot(range(5), tracker[i].T)
         plt.savefig(os.path.join("plots", ["J","P","w"][i] + "-opt.png"))
         plt.show()
+
+    plt.plot(range(5), loss_track)
+    plt.savefig(os.path.join("plots", "loss-opt.png"))
+    plt.show()

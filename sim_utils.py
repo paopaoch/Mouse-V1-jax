@@ -2,7 +2,6 @@ import jax.numpy as np
 
 
 sigmoid = lambda x: 1 / (1 + np.exp(-x))
-hardness = 5
 
 softplus = lambda x, b: np.log(1 + np.exp(b * x)) / b
 
@@ -18,7 +17,7 @@ def block_matrix(V, d):
                      [V[1,0]*np.ones((d[1], d[0])), V[1,1]*np.ones((d[1], d[1]))]])
 
 
-def Euler2fixedpt(dxdt, x_initial, Nmax=10, Navg=5, dt=0.001, xtol=1e-5, xmin=1e-0):
+def Euler2fixedpt(dxdt, x_initial, Nmax=5, Navg=2, dt=0.001, xtol=1e-5, xmin=1e-0):
     """
     Finds the fixed point of the D-dim ODE set dx/dt = v(x) (where the function v(.) is called dxdt(.) in this code) 
     using the Euler update with sufficiently large dt (to gain in computational time).
@@ -58,7 +57,7 @@ def Euler2fixedpt(dxdt, x_initial, Nmax=10, Navg=5, dt=0.001, xtol=1e-5, xmin=1e
 
 
 # This is the input-output function (for mean-field spiking neurons) that you would use Max
-def Phi(mu, sigma, tau=0.01, Vt=20, Vr=0, tau_ref=0):
+def Phi(mu, sigma, hardness=50, tau=0.01, Vt=20, Vr=0, tau_ref=0):
     """
      Calculates rate from the Ricciardi equation, with an error
      less than 10^{-5}. If the LIF neuron's voltage, V, satisfies between spikes
@@ -89,21 +88,25 @@ def Phi(mu, sigma, tau=0.01, Vt=20, Vr=0, tau_ref=0):
     rate = np.zeros_like(xm)
     
     xm_pos = sigmoid(xm * hardness)
+    inds = sigmoid(-xm * hardness) * sigmoid(xp * hardness)
+    
+    xp1 = softplus(xp, hardness)
+    xm1 = softplus(xm, hardness)
+    
     #xm_pos = xm > 0
-    rate = (rate * (1 - xm_pos)) + (xm_pos / softplus(f_ricci(xp) - f_ricci(xm), hardness))
+    rate = (rate * (1 - xm_pos)) + (xm_pos / softplus(f_ricci(xp1) - f_ricci(xm1), hardness))
     
 
-    inds = sigmoid(-xm * hardness) * sigmoid(xp * hardness)
     #inds = (xp > 0) & (xm <= 0)
-    rate = (rate * (1 - inds)) + (inds / (f_ricci(xp) + np.exp(xm**2) * g_ricci(-xm)))
+    rate = (rate * (1 - inds)) + (inds / (f_ricci(xp1) + np.exp(xm**2) * g_ricci(softplus(-xm, hardness))))
     
     
     # The following is commented out because Vr is always zero, so xp is always positive
 
     # xp_neg = sigmoid(-xp * hardness)
     # xp_neg = xp <= 0
-    # rate = (rate * (1 - xp_neg)) + (xp_neg * ( np.exp(-xm**2 - np.log(g_ricci(-xm) 
-    #                      - np.exp(xp**2 - xm**2) * g_ricci(-xp)))))
+    # rate = (rate * (1 - xp_neg)) + (xp_neg * ( np.exp(-xm**2 - np.log(g_ricci(softplus(-xm, hardness)) 
+    #                      - np.exp(xp**2 - xm**2) * g_ricci(softplus(-xp, hardness))))))
     
     rate = 1 / (tau_ref + 1 / rate)
     
@@ -117,7 +120,7 @@ def lif_regular(mu, tau, Vt, Vr):
     return rate / tau
 
 def f_ricci(x):
-    x_plus = softplus(x, hardness)
+    x_plus = x
 
     z = x_plus / (1 + x_plus)
     a = np.array([0.0, 
@@ -131,7 +134,7 @@ def f_ricci(x):
                                 + a[7] *(-z)**7 + a[8] *(-z)**8 + a[9] *(-z)**9 )
 
 def g_ricci(x):
-    x_plus = softplus(x, hardness)
+    x_plus = x
 
     z = x_plus / (2 + x_plus)
     enum = (  3.5441754117462949 * z    - 7.0529131065835378 * z**2 
