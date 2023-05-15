@@ -36,8 +36,9 @@ def optimise_JPw_2(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, or
     print(loss)
 
 
-def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J_init, P_init, w_init, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext):
-    log_params = np.log(np.array([J_init, P_init, w_init]))
+def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J_init, P_init, w_init, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext, n_iter=12):
+    init_params = np.array([J_init, P_init, w_init])
+    log_params = np.log(init_params)
     rand_mat = level3.random_matrix(N_E + N_I)
 
     def optimising_func(log_params):
@@ -46,10 +47,11 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
 
     gradient_func = grad(optimising_func)
 
-    tracker = np.zeros((3, 4, 5))
-    loss_track = np.zeros((5,1))
+    tracker = np.zeros((3, 4, n_iter))
+    loss_track = np.zeros((n_iter, 1))
 
-    for i in range(5):
+
+    for i in range(n_iter):
         print("params: " + str(np.exp(log_params)))
         t0 = time.process_time()
 
@@ -71,13 +73,15 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
         tracker = tracker.at[:, 2:, i].set(np.exp(log_params[:, 1, :]))
         loss_track = loss_track.at[i].set(loss)
 
-    print(loss)
+    print("Final loss: " + str(loss))
+    print("Initial params: " + str(init_params))
+    print("Final params: " + str(np.exp(log_params)))
     
     for i in range(3):
-        plt.plot(range(5), tracker[i].T)
+        plt.plot(range(n_iter), tracker[i].T)
         plt.savefig(os.path.join("plots", ["J","P","w"][i] + "-opt.png"))
         plt.show()
 
-    plt.plot(range(5), loss_track)
+    plt.plot(range(n_iter), loss_track)
     plt.savefig(os.path.join("plots", "loss-opt.png"))
     plt.show()

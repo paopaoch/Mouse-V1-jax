@@ -15,7 +15,7 @@ with open(os.path.join('Data', 'data_save.pkl'), 'rb') as f:
     data = pickle.load(f)
 
 # Network size
-N = 1000
+N = 10000
 
 N_E = int(.8 * N)
 N_I = N - N_E
@@ -119,6 +119,7 @@ def test4():
 
 
 if __name__ == "__main__":
+    jax.TF_CPP_MIN_LOG_LEVEL=0
 
     x = np.linspace(-10, 10, 101)
 
