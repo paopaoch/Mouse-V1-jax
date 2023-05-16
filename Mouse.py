@@ -1,3 +1,5 @@
+print("- - - - running - - - -")
+
 import level4, level3, level2, level1, sim_utils
 import jax.numpy as np
 from jax import grad
