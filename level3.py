@@ -4,6 +4,7 @@ import jax.numpy as np
 import jax.random as jrand
 from jax.lax import map as jmap
 
+
 prng = jrand.PRNGKey(1)
 
 

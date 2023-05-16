@@ -1,7 +1,7 @@
 import level4, level3, level2, level1, sim_utils
 import jax.numpy as np
-from jax import grad
 import jax
+import numpy
 import os
 import pickle
 import matplotlib.pyplot as plt
