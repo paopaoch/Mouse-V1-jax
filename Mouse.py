@@ -15,7 +15,7 @@ with open(os.path.join('Data', 'data_save.pkl'), 'rb') as f:
     data = pickle.load(f)
 
 # Network size
-N = 10000
+N = 4000
 
 N_E = int(.8 * N)
 N_I = N - N_E
@@ -99,8 +99,9 @@ def test1():
 
 def test2():
     t0 = time.process_time()
-    TC, avg_step = level3.generate_tuning_curves(example_random, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    TC, avg_step, balance = level3.generate_tuning_curves(example_random, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
     print(time.process_time() - t0)
+    plt.show()
 
     for i, tc in enumerate(TC):
         plt.imshow(tc)
@@ -123,9 +124,10 @@ if __name__ == "__main__":
 
     x = np.linspace(-10, 10, 101)
 
-    plt.plot(x, sim_utils.f_ricci(x))
-    plt.savefig(os.path.join("plots", "plot.png"))
+    #plt.plot(x, sim_utils.f_ricci(x))
+    #plt.savefig(os.path.join("plots", "plot.png"))
     
     
 
     test4()
+    test2()

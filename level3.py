@@ -47,18 +47,23 @@ def generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w,
         W, W2 = level2.generate_network(C, J, N_E, N_I)
 
         r_fp, avg_step = level1.network_to_state(N, W, W2, c, theta, T_inv, tau, tau_ref, pref, g, w_ff, sig_ext)
+
+        Wr = W * r_fp[None, :]
+        B = np.sum(np.absolute(Wr), axis=1) / np.absolute(np.sum(Wr, axis=1))
+
         #return r_fp, avg_step
-        return np.concatenate([r_fp, np.array([avg_step])])
+        return np.concatenate([r_fp, np.array([avg_step, np.mean(B), np.var(B)])])
 
     
     inputs_list = np.array(np.meshgrid(contrasts, orientations)).T.reshape([-1,2])
 
-    solves = np.array(jmap(solve_for, inputs_list)).reshape([len(contrasts), len(orientations), N+1])                     
+    solves = np.array(jmap(solve_for, inputs_list)).reshape([len(contrasts), len(orientations), N+3])                     
     result = np.moveaxis(solves, 2, 0)   
                 
     
-    avg_step = np.mean(result[-1])
-    tuning_curves = result[:-1]
+    balance = result[-2:]
+    avg_step = np.mean(result[-3])
+    tuning_curves = result[:-3]
     '''
 
     tuning_curves = np.zeros((N, len(contrasts), len(orientations)))
@@ -70,13 +75,34 @@ def generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w,
             tuning_curves[:, i, j] = r_fp
             avg_tot += avg_step
     '''
-    return tuning_curves, avg_step
+    return tuning_curves, avg_step, balance
 
     
 def loss_from_parameters(data, step_size_effect, n_subsamples, rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext):
-    tuning_curves, avg_step = generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    tuning_curves, avg_step, balance = generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
 
     sub_tuning_curves = jrand.choice(prng, tuning_curves, (n_subsamples,1))
     sub_data = jrand.choice(prng, data, (n_subsamples,1))
 
     return loss_function(sub_tuning_curves, avg_step, sub_data, step_size_effect)
+
+
+def get_balance(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext):
+    tuning_curves, avg_step, balance = generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+
+    balance_mean = np.mean(balance[0])
+    balance_var =  np.var(balance[0]) #+ np.mean(balance[1])
+
+    print(balance)
+
+    return balance_mean, np.sqrt(balance_var)
+
+def get_balance(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext):
+    tuning_curves, avg_step, balance = generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+
+    balance_mean = np.mean(balance[0])
+    balance_var =  np.var(balance[0]) #+ np.mean(balance[1])
+
+    print(balance)
+
+    return balance_mean, np.sqrt(balance_var)

@@ -25,6 +25,7 @@
     <Compile Include="level2.py" />
     <Compile Include="level3.py" />
     <Compile Include="level4.py" />
+    <Compile Include="Pickler.py" />
     <Compile Include="sim_utils.py" />
     <Compile Include="Mouse.py" />
   </ItemGroup>

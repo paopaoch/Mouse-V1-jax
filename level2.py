@@ -29,7 +29,8 @@ def generate_C_matrix(prob, rand_mat):
 
 def generate_network(C, J, N_E, N_I):
     '''Randomly generate network'''
-    J_full = sim_utils.block_matrix(J, [N_E, N_I])
+    EI = np.array([[1, -1], [1, -1]])
+    J_full = sim_utils.block_matrix(J * EI, [N_E, N_I])
 
     # Weight matrix and squared weight matrix
     W = J_full * C

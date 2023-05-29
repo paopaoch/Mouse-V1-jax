@@ -2,6 +2,7 @@ import numpy as np
 import os
 import pandas as pd
 import pickle
+import matplotlib.pyplot as plt
 
 
 def oc_matrix(u, freq=None, phase=None):
@@ -57,5 +58,10 @@ for j, u in enumerate(units):
         M, Sd = oc_matrix(u, spf)
         tuning_curves[j*n_spat + i] = M  # Seems inefficient
 
-with open(os.path.join('Data', 'data_save.pkl'), 'wb') as outp:
+
+for i, tc in enumerate(tuning_curves):
+    plt.imshow(tc)
+    plt.savefig(os.path.join("plots", "q"+str(i)+".png"))
+
+with open(os.path.join('Data', 'data_save2.pkl'), 'wb') as outp:
     pickle.dump(tuning_curves, outp, pickle.HIGHEST_PROTOCOL)

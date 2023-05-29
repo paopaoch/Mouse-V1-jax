@@ -8,7 +8,7 @@ softplus = lambda x, b: np.log(1 + np.exp(b * x)) / b
 
 def circ_gauss(x, w):
     # Circular Gaussian from 0 to 180 deg
-    return np.exp((np.cos(x * np.pi/90) - 1) / np.square(np.pi/90 * w))
+    return np.exp((np.cos(x * np.pi/90) - 1) / (2 * np.square(np.pi/180 * w)))
 
 
 def block_matrix(V, d):

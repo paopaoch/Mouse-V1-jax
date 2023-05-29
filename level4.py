@@ -67,16 +67,20 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
         print("cpu time: " + str(t2 - t1))
         print()
 
-        log_params = log_params - 0.03 * gradient
+        log_params = log_params - 0.1 * gradient
 
         tracker = tracker.at[:, :2, i].set(np.exp(log_params[:, 0, :]))
         tracker = tracker.at[:, 2:, i].set(np.exp(log_params[:, 1, :]))
         loss_track = loss_track.at[i].set(loss)
 
+    params = np.exp(log_params)
     print("Final loss: " + str(loss))
     print("Initial params: " + str(init_params))
-    print("Final params: " + str(np.exp(log_params)))
-    
+    print("Final params: " + str(params))
+
+    balance_mean, balance_std = level3.get_balance(rand_mat, N_E, N_I, contrasts, orientations, *params, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    print("Balance: " + str(balance_mean) + " std: " + str(balance_std))
+    '''
     for i in range(3):
         plt.plot(range(n_iter), tracker[i].T)
         plt.savefig(os.path.join("plots", ["J","P","w"][i] + "-opt.png"))
@@ -85,3 +89,4 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
     plt.plot(range(n_iter), loss_track)
     plt.savefig(os.path.join("plots", "loss-opt.png"))
     plt.show()
+    '''
