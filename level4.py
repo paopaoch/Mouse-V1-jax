@@ -80,6 +80,9 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
 
     balance_mean, balance_std = level3.get_balance(rand_mat, N_E, N_I, contrasts, orientations, *params, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
     print("Balance: " + str(balance_mean) + " std: " + str(balance_std))
+
+    K_E, K_I = level3.get_K(rand_mat, N_E, N_I, *params, pref_E, pref_I)
+    print("K_E: " + str(K_E) + " K_I: " + str(K_I))
     '''
     for i in range(3):
         plt.plot(range(n_iter), tracker[i].T)

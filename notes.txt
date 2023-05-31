@@ -10,3 +10,22 @@ Only 10% processor is used and no GPU
 
 N=1000: 41 seconds, loss=31.0
 N=10000: 380 seconds, loss=6.90
+
+
+EI BALANCE:
+
+N=100:
+	Balance: 16.243254	std: 43.203728
+	K_E: 2.0			K_I: 11.650001
+
+N=400:
+	Balance: 1.6197176	std: 0.93236625
+	K_E: 10.21875		K_I: 46.7
+
+N=1000:
+	Balance: 1.1358376	std: 0.010393707
+	K_E: 35.53875		 K_I: 199.885
+
+N=4000:
+	Balance: 1.0105238	std: 0.0022976205
+	K_E: 805.3278		K_I: 799.0012

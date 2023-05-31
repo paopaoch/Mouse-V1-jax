@@ -97,12 +97,23 @@ def get_balance(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau
 
     return balance_mean, np.sqrt(balance_var)
 
+
 def get_balance(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext):
     tuning_curves, avg_step, balance = generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
 
     balance_mean = np.mean(balance[0])
     balance_var =  np.var(balance[0]) #+ np.mean(balance[1])
 
-    print(balance)
+    #print(balance)
 
     return balance_mean, np.sqrt(balance_var)
+
+
+def get_K(rand_mat, N_E, N_I, J, P, w, pref_E, pref_I):
+    prob = level2.generate_prob_matrix(pref_E, pref_I, P, w)
+    C = level2.generate_C_matrix(prob, rand_mat)
+
+    K_E = np.mean(np.sum(C[:N_E, : ] > 0.5, axis = 1))
+    K_I = np.mean(np.sum(C[N_E:, : ] > 0.5, axis = 1))
+
+    return K_E, K_I
