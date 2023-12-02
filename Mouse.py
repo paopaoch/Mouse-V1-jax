@@ -15,7 +15,7 @@ with open(os.path.join('Data', 'data_save.pkl'), 'rb') as f:
     data = pickle.load(f)
 
 # Network size
-N = 4000
+N = 2000
 
 N_E = int(.8 * N)
 N_I = N - N_E
