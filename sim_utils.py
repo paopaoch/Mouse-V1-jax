@@ -17,7 +17,7 @@ def block_matrix(V, d):
                      [V[1,0]*np.ones((d[1], d[0])), V[1,1]*np.ones((d[1], d[1]))]])
 
 
-def Euler2fixedpt(dxdt, x_initial, Nmax=100, Navg=80, dt=0.001, xtol=1e-5, xmin=1e-0):
+def Euler2fixedpt(dxdt, x_initial, Nmax=50, Navg=40, dt=0.001, xtol=1e-5, xmin=1e-0):
     """
     Finds the fixed point of the D-dim ODE set dx/dt = v(x) (where the function v(.) is called dxdt(.) in this code) 
     using the Euler update with sufficiently large dt (to gain in computational time).
