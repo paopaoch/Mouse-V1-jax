@@ -15,7 +15,7 @@ with open(os.path.join('Data', 'data_save.pkl'), 'rb') as f:
     data = pickle.load(f)
 
 # Network size
-N = 7000
+N = 2000
 
 N_E = int(.8 * N)
 N_I = N - N_E
@@ -31,7 +31,8 @@ orientations = np.array([0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165])
 contrasts = np.array([0., 0.0432773, 0.103411, 0.186966, 0.303066, 0.464386, 0.68854, 1.])
 
 
-step_size_effect = 0.01
+# step_size_effect = 0.01
+step_size_effect = 0.002
 n_subsamples = 100
 
 # Parameters for input stage
@@ -72,11 +73,22 @@ tau_ref = np.concatenate([
 
 
 # First layer
-J = np.array([[0.63, 0.6], [0.32, 0.25]]) * np.sqrt(10)
+# J = np.array([[0.63, 0.6], [0.32, 0.25]]) * np.sqrt(10)  # Max vals
+# P = np.array([[0.11, 0.11], [0.45, 0.45]])
+# w = 32 * np.ones([2,2])
 
-P = np.array([[0.11, 0.11], [0.45, 0.45]])
+# J = np.array([[0.32, 0.24], [0.63, 0.16]]) * np.sqrt(10)  # Keen vals
+# P = np.array([[0.4, 0.1], [0.1, 0.4]])
+# w = 32 * np.ones([2,2])
 
-w = 32 * np.ones([2,2])
+
+# J = np.array([[0.01, 0.22], [0.6, 0.16]]) * np.sqrt(10)  # Torch minima old
+# P = np.array([[0.6, 0.07], [0.07, 0.2]])
+# w = np.array([[72, 31], [31, 32]])
+
+J = np.array([[0.71505201, 0.75208946], [2.03317782, 0.52660739]]) * np.sqrt(10)  # Torch minima
+P = np.array([[0.22682967, 0.09898978], [0.09933817, 0.30957649]])
+w = np.array([[25.74653359, 31.83607243], [31.90937967, 31.78517544]])
 
 example_random = level3.random_matrix(N)
 
