@@ -57,7 +57,7 @@ def Euler2fixedpt(dxdt, x_initial, Nmax=100, Navg=80, dt=0.001, xtol=1e-5, xmin=
 
 
 # This is the input-output function (for mean-field spiking neurons) that you would use Max
-def Phi(mu, sigma, hardness=50, tau=0.01, Vt=20, Vr=0, tau_ref=0):
+def Phi(mu, sigma, tau=0.01, hardness=0.01, Vt=20, Vr=0, tau_ref=0):
     """
      Calculates rate from the Ricciardi equation, with an error
      less than 10^{-5}. If the LIF neuron's voltage, V, satisfies between spikes

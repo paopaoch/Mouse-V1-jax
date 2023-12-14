@@ -14,8 +14,11 @@ def optimise_JPw_2(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, or
         J = np.array([[J1, J_init[0,1]], [J_init[1,0], J_init[1,1]]])
         return level3.loss_from_parameters(data, step_size_effect, n_subsamples, rand_mat, N_E, N_I, contrasts, orientations, J, P_init, w_init, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
 
-    gradient_func = jit(grad(optimising_func))
-    jit_func = jit(optimising_func)
+    # gradient_func = jit(grad(optimising_func))
+    # jit_func = jit(optimising_func)
+
+    gradient_func = grad(optimising_func)
+    jit_func = optimising_func
 
     for i in range(3):
         print("params: " + str(params))
