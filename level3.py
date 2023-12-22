@@ -18,16 +18,35 @@ def kernel(x, y, w=1, axes=[-2,-1]):
     return np.exp( - np.sum((x - y)**2, axis=axes) / (2 * w**2))
 
 
-def MMD(X, Y):
-    # Maximum Mean Discrepancy
-    N = len(X)
-    M = len(Y)
+# def MMD(X, Y):
+#     # Maximum Mean Discrepancy
+#     N = len(X)
+#     M = len(Y)
     
-    XX = np.mean(kernel(X[None, :, :, :], X[:, None, :, :]))
-    XY = np.mean(kernel(X[None, :, :, :], Y[:, None, :, :]))
-    YY = np.mean(kernel(Y[None, :, :, :], Y[:, None, :, :]))
+#     XX = np.mean(kernel(X[None, :, :, :], X[:, None, :, :]))
+#     XY = np.mean(kernel(X[None, :, :, :], Y[:, None, :, :]))
+#     YY = np.mean(kernel(Y[None, :, :, :], Y[:, None, :, :]))
     
-    return XX - 2*XY + YY
+#     return XX - 2*XY + YY
+
+
+def individual_terms_vmap(x, y):
+    N = x.shape[0]
+    M = y.shape[0]
+
+    def inner_loop(i):
+        x_repeated = np.expand_dims(x[i, :, :], 0).repeat(M, axis=0)
+        return np.mean(kernel(y, x_repeated))
+
+    accum_output = jax.vmap(inner_loop)(np.arange(N))
+    
+    return np.sum(accum_output) / N
+
+def MMD(x, y):
+    XX  = individual_terms_vmap(x, x)
+    XY  = individual_terms_vmap(x, y)
+    YY  = individual_terms_vmap(y, y)
+    return XX + YY - 2 * XY
 
 
 def loss_function(sim_tuning_curves, avg_step, data, step_size_effect):
