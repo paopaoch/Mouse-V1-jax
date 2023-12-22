@@ -1,5 +1,6 @@
 import level2
 import level1
+import jax
 import jax.numpy as np
 import jax.random as jrand
 from jax.lax import map as jmap
@@ -57,11 +58,12 @@ def generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w,
     
     inputs_list = np.array(np.meshgrid(contrasts, orientations)).T.reshape([-1,2])
 
-    solves = np.array(jmap(solve_for, inputs_list)).reshape([len(contrasts), len(orientations), N+3])                     
+    # solves = np.array(jmap(solve_for, inputs_list)).reshape([len(contrasts), len(orientations), N+3])   
+    solves = np.array(jax.vmap(solve_for)(inputs_list)).reshape([len(contrasts), len(orientations), N+3])             
     result = np.moveaxis(solves, 2, 0)   
                 
     
-    balance = result[-2:]
+    balance = result[-2:]  # Q: Last two elem. Why?
     avg_step = np.mean(result[-3])
     tuning_curves = result[:-3]
     '''
@@ -88,6 +90,7 @@ def loss_from_parameters(data, step_size_effect, n_subsamples, rand_mat, N_E, N_
 
 
 def get_balance(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext):
+    """Q: What does this function do?"""
     tuning_curves, avg_step, balance = generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
 
     balance_mean = np.mean(balance[0])
@@ -98,15 +101,15 @@ def get_balance(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau
     return balance_mean, np.sqrt(balance_var)
 
 
-def get_balance(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext):
-    tuning_curves, avg_step, balance = generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+# def get_balance(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext):
+#     tuning_curves, avg_step, balance = generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
 
-    balance_mean = np.mean(balance[0])
-    balance_var =  np.var(balance[0]) #+ np.mean(balance[1])
+#     balance_mean = np.mean(balance[0])
+#     balance_var =  np.var(balance[0]) #+ np.mean(balance[1])
 
-    #print(balance)
+#     #print(balance)
 
-    return balance_mean, np.sqrt(balance_var)
+#     return balance_mean, np.sqrt(balance_var)
 
 
 def get_K(rand_mat, N_E, N_I, J, P, w, pref_E, pref_I):

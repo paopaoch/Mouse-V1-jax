@@ -15,7 +15,8 @@ with open(os.path.join('Data', 'data_save.pkl'), 'rb') as f:
     data = pickle.load(f)
 
 # Network size
-N = 2000
+# N = 2000
+N = 10000
 
 N_E = int(.8 * N)
 N_I = N - N_E
@@ -131,6 +132,11 @@ def test4():
     level4.optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
 
 
+def test5():
+    level4.optimise_JPw_no_grad(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+
+
+
 if __name__ == "__main__":
     jax.TF_CPP_MIN_LOG_LEVEL=0
 
@@ -138,7 +144,6 @@ if __name__ == "__main__":
 
     #plt.plot(x, sim_utils.f_ricci(x))
     #plt.savefig(os.path.join("plots", "plot.png"))
-    
     
 
     test4()

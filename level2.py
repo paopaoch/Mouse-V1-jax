@@ -23,6 +23,7 @@ def generate_prob_matrix(pref_E, pref_I, P, w):
 
 
 def generate_C_matrix(prob, rand_mat):
+    """Q: this means the neurons do not loop back to itself?"""
     C = sigmoid_matrix(prob, rand_mat) * (1-np.eye(prob.shape[0]))
     return C
 
