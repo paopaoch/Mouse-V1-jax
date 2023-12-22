@@ -50,6 +50,9 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
 
     gradient_func = grad(optimising_func)
 
+    gradient_func = jit(gradient_func)
+    optimising_func = jit(optimising_func)
+
     tracker = np.zeros((3, 4, n_iter))
     loss_track = np.zeros((n_iter, 1))
 
