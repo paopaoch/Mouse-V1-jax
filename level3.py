@@ -32,6 +32,7 @@ def MMD(X, Y):
 
 def loss_function(sim_tuning_curves, avg_step, data, step_size_effect):
     loss = MMD(sim_tuning_curves, data) + step_size_effect * (np.maximum(1, avg_step) - 1)
+    print("Calculated loss")
     return loss
 
 
@@ -61,7 +62,7 @@ def generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w,
     # solves = np.array(jmap(solve_for, inputs_list)).reshape([len(contrasts), len(orientations), N+3])   
     solves = np.array(jax.vmap(solve_for)(inputs_list)).reshape([len(contrasts), len(orientations), N+3])             
     result = np.moveaxis(solves, 2, 0)   
-                
+    print("Ran all orientation and contrast")
     
     balance = result[-2:]  # Q: Last two elem. Why?
     avg_step = np.mean(result[-3])
