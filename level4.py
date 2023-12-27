@@ -60,6 +60,7 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
     for i in range(n_iter):
         print("params: " + str(np.exp(log_params)))
         t0 = time.process_time()
+        t0_elapsed = time.time()
 
         loss = optimising_func(log_params)
         t1 = time.process_time()
@@ -71,6 +72,7 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
         t2 = time.process_time()
         print("gradient: " + str(gradient))
         print("cpu time: " + str(t2 - t1))
+        print("Actual time: " + str(time.time() - t0_elapsed))
         print()
 
         log_params = log_params - 0.1 * gradient
@@ -84,8 +86,8 @@ def optimise_JPw(data, step_size_effect, n_subsamples, N_E, N_I, contrasts, orie
     print("Initial params: " + str(init_params))
     print("Final params: " + str(params))
 
-    balance_mean, balance_std = level3.get_balance(rand_mat, N_E, N_I, contrasts, orientations, *params, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
-    print("Balance: " + str(balance_mean) + " std: " + str(balance_std))
+    # balance_mean, balance_std = level3.get_balance(rand_mat, N_E, N_I, contrasts, orientations, *params, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    # print("Balance: " + str(balance_mean) + " std: " + str(balance_std))
 
     K_E, K_I = level3.get_K(rand_mat, N_E, N_I, *params, pref_E, pref_I)
     print("K_E: " + str(K_E) + " K_I: " + str(K_I))
@@ -113,16 +115,17 @@ def optimise_JPw_no_grad(data, step_size_effect, n_subsamples, N_E, N_I, contras
     loss_track = np.zeros((n_iter, 1))
 
     optimising_func = jit(optimising_func)
-    print("DONE JIT")
 
     for i in range(n_iter):
         print("params: " + str(np.exp(log_params)))
         t0 = time.process_time()
+        t0_elapsed = time.time()
 
         loss = optimising_func(log_params)
         t1 = time.process_time()
         print("loss: " + str(loss))
         print("cpu time: " + str(t1 - t0))
+        print("Actual time: " + str(time.time() - t0_elapsed))
         
 
         log_params = log_params - 0.1 * 0
@@ -136,8 +139,8 @@ def optimise_JPw_no_grad(data, step_size_effect, n_subsamples, N_E, N_I, contras
     print("Initial params: " + str(init_params))
     print("Final params: " + str(params))
 
-    balance_mean, balance_std = level3.get_balance(rand_mat, N_E, N_I, contrasts, orientations, *params, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
-    print("Balance: " + str(balance_mean) + " std: " + str(balance_std))
+    # balance_mean, balance_std = level3.get_balance(rand_mat, N_E, N_I, contrasts, orientations, *params, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
+    # print("Balance: " + str(balance_mean) + " std: " + str(balance_std))
 
     K_E, K_I = level3.get_K(rand_mat, N_E, N_I, *params, pref_E, pref_I)
     print("K_E: " + str(K_E) + " K_I: " + str(K_I))

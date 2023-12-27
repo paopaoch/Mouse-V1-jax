@@ -50,6 +50,7 @@ def MMD(x, y):
 
 
 def loss_function(sim_tuning_curves, avg_step, data, step_size_effect):
+    print("Calculating loss")
     loss = MMD(sim_tuning_curves, data) + step_size_effect * (np.maximum(1, avg_step) - 1)
     print("Calculated loss")
     return loss
@@ -78,10 +79,10 @@ def generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w,
     
     inputs_list = np.array(np.meshgrid(contrasts, orientations)).T.reshape([-1,2])
 
-    # solves = np.array(jmap(solve_for, inputs_list)).reshape([len(contrasts), len(orientations), N+3])   
-    solves = np.array(jax.vmap(solve_for)(inputs_list)).reshape([len(contrasts), len(orientations), N+3])             
-    result = np.moveaxis(solves, 2, 0)   
+    solves = np.array(jmap(solve_for, inputs_list)).reshape([len(contrasts), len(orientations), N+3])   
+    # solves = np.array(jax.vmap(solve_for)(inputs_list)).reshape([len(contrasts), len(orientations), N+3])  # vmap uses a lot of memory
     print("Ran all orientation and contrast")
+    result = np.moveaxis(solves, 2, 0)   
     
     balance = result[-2:]  # Q: Last two elem. Why?
     avg_step = np.mean(result[-3])
@@ -110,13 +111,11 @@ def loss_from_parameters(data, step_size_effect, n_subsamples, rand_mat, N_E, N_
 
 
 def get_balance(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext):
-    """Q: What does this function do?"""
+    """Q: What does this function do? seems like thee np.mean and np.var is using a lot of memory"""
     tuning_curves, avg_step, balance = generate_tuning_curves(rand_mat, N_E, N_I, contrasts, orientations, J, P, w, T_inv, tau, tau_ref, pref_E, pref_I, g, w_ff, sig_ext)
 
     balance_mean = np.mean(balance[0])
     balance_var =  np.var(balance[0]) #+ np.mean(balance[1])
-
-    print(balance)
 
     return balance_mean, np.sqrt(balance_var)
 
