@@ -39,42 +39,42 @@ def Euler2fixedpt(dxdt, x_initial, Nmax=100, Navg=80, dt=0.001, xtol=1e-5, xmin=
     xvec = found fixed point solution
     (avg_sum / Navg) = average dx normalised by xtol
     """
-    def step(xvec):  # writing it this way doesn't seem to speed things up (though compilation is faster) that much but lets keep things functional
-        return xvec + dxdt(xvec) * dt
-
-    avgStart = Nmax - Navg
-    xvec = x_initial
-
-    # Perform the loop without taking average step size
-    xvec = jax.lax.fori_loop(0, avgStart, lambda _, x: step(x), xvec)
-
-    # Perform the loop whilst recording average step size
-    def step_and_avg(n, vals):
-        xvec, avg_sum = vals
-        dx = dxdt(xvec) * dt
-        xvec = xvec + dx
-        avg_sum += np.abs(dx / np.maximum(xmin, np.abs(xvec))).max() / xtol
-        return xvec, avg_sum
-
-    xvec, avg_sum = jax.lax.fori_loop(0, Navg, step_and_avg, (xvec, 0.0))
-
-    return xvec, avg_sum / Navg
+    # def step(xvec):  # writing it this way doesn't seem to speed things up (though compilation is faster) that much but lets keep things functional
+    #     return xvec + dxdt(xvec) * dt
 
     # avgStart = Nmax - Navg
-    # avg_sum = 0
     # xvec = x_initial
-    
-    # for n in range(avgStart):  # Loop without taking average step size
-    #     dx = dxdt(xvec) * dt
-    #     xvec = xvec + dx        
 
-    # for n in range(Navg):  # Loop whilst recording average step size
+    # # Perform the loop without taking average step size
+    # xvec = jax.lax.fori_loop(0, avgStart, lambda _, x: step(x), xvec)
+
+    # # Perform the loop whilst recording average step size
+    # def step_and_avg(n, vals):
+    #     xvec, avg_sum = vals
     #     dx = dxdt(xvec) * dt
     #     xvec = xvec + dx
-        
-    #     avg_sum += np.abs(dx /np.maximum(xmin, np.abs(xvec)) ).max() / xtol
+    #     avg_sum += np.abs(dx / np.maximum(xmin, np.abs(xvec))).max() / xtol
+    #     return xvec, avg_sum
+
+    # xvec, avg_sum = jax.lax.fori_loop(0, Navg, step_and_avg, (xvec, 0.0))
 
     # return xvec, avg_sum / Navg
+
+    avgStart = Nmax - Navg
+    avg_sum = 0
+    xvec = x_initial
+    
+    for n in range(avgStart):  # Loop without taking average step size
+        dx = dxdt(xvec) * dt
+        xvec = xvec + dx        
+
+    for n in range(Navg):  # Loop whilst recording average step size
+        dx = dxdt(xvec) * dt
+        xvec = xvec + dx
+        
+        avg_sum += np.abs(dx /np.maximum(xmin, np.abs(xvec)) ).max() / xtol
+
+    return xvec, avg_sum / Navg
 
 
 # This is the input-output function (for mean-field spiking neurons) that you would use Max
